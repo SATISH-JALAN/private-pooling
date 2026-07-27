@@ -1,0 +1,53 @@
+pragma language_version 0.15.0;
+
+import CompactStandardLibrary;
+
+export enum PollState { CLOSED, OPEN }
+
+export ledger pollState: PollState;
+export ledger pollQuestion: Maybe<Opaque<"string">>;
+export ledger yesVotes: Counter;
+export ledger noVotes: Counter;
+export ledger abstainVotes: Counter;
+export ledger owner: Bytes<32>;
+export ledger sequence: Counter;
+
+witness localSecretKey(): Bytes<32>;
+
+export circuit derivedPublicKey(sk: Bytes<32>, sequence: Bytes<32>): Bytes<32> {
+  return persistent_hash<Vector<2, Bytes<32>>>([sk, sequence]);
+}
+
+constructor() {
+  pollState = PollState.CLOSED;
+  pollQuestion = none<Opaque<"string">>();
+  owner = pad(32, "0");
+}
+
+export circuit createPoll(question: Opaque<"string">): [] {
+  assert pollState == PollState.CLOSED "A poll is already open";
+  pollQuestion = some<Opaque<"string">>(question);
+  pollState = PollState.OPEN;
+  sequence.increment(1);
+  owner = disclose(derivedPublicKey(localSecretKey(), pad(32, "0")));
+}
+
+export circuit castVote(choice: Uint<8>): [] {
+  assert pollState == PollState.OPEN "Poll is not currently open";
+  assert choice <= 2 "Invalid choice: 0=Yes, 1=No, 2=Abstain";
+
+  if (choice == 0) {
+    yesVotes.increment(1);
+  } else if (choice == 1) {
+    noVotes.increment(1);
+  } else {
+    abstainVotes.increment(1);
+  }
+}
+
+export circuit closePoll(): [] {
+  assert pollState == PollState.OPEN "Poll is not currently open";
+  const callerPk = disclose(derivedPublicKey(localSecretKey(), pad(32, "0")));
+  assert callerPk == owner "Only the poll creator can close the poll";
+  pollState = PollState.CLOSED;
+}
