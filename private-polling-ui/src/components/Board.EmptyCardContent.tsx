@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
 import { type ContractAddress } from '@midnight-ntwrk/midnight-js-protocol/compact-runtime';
-import { CardActions, CardContent, IconButton, Tooltip, Typography } from '@mui/material';
-import PollIcon from '@mui/icons-material/HowToVoteOutlined';
-import CreatePollIcon from '@mui/icons-material/AddCircleOutlined';
-import JoinPollIcon from '@mui/icons-material/AddLinkOutlined';
+import {
+  Box,
+  Button,
+  CardContent,
+  Divider,
+  Typography,
+} from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlined';
+import LinkIcon from '@mui/icons-material/Link';
+import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import { TextPromptDialog } from './TextPromptDialog';
 
 export interface EmptyCardContentProps {
@@ -18,43 +24,79 @@ export const EmptyCardContent: React.FC<Readonly<EmptyCardContentProps>> = ({
   const [textPromptOpen, setTextPromptOpen] = useState(false);
 
   return (
-    <React.Fragment>
-      <CardContent>
-        <Typography align="center" variant="h1" color="primary.dark">
-          <PollIcon fontSize="large" />
+    <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {/* Icon + title */}
+      <Box sx={{ textAlign: 'center', pt: 1 }}>
+        <HowToVoteIcon sx={{ fontSize: 48, color: 'rgba(168,168,168,0.5)', mb: 1 }} />
+        <Typography variant="body1" sx={{ fontWeight: 700, color: '#e0e0e0' }}>
+          Private Poll
         </Typography>
-        <Typography data-testid="board-posted-message" align="center" variant="body2" color="primary.dark">
-          Create a new Private Poll, or join an existing one...
+        <Typography
+          data-testid="board-posted-message"
+          variant="caption"
+          sx={{ color: '#888', display: 'block', mt: 0.5 }}
+        >
+          Deploy a new poll contract or join one that already exists.
         </Typography>
-      </CardContent>
-      <CardActions disableSpacing sx={{ justifyContent: 'center' }}>
-        <Tooltip title="Deploy a new Private Poll contract">
-          <IconButton data-testid="board-deploy-btn" onClick={onCreateBoardCallback}>
-            <CreatePollIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Join an existing Private Poll by Contract Address">
-          <IconButton
-            data-testid="board-join-btn"
-            onClick={() => {
-              setTextPromptOpen(true);
-            }}
-          >
-            <JoinPollIcon />
-          </IconButton>
-        </Tooltip>
-      </CardActions>
+      </Box>
+
+      <Divider sx={{ borderColor: 'rgba(168,168,168,0.1)' }} />
+
+      {/* Action buttons */}
+      <Button
+        data-testid="board-deploy-btn"
+        variant="contained"
+        fullWidth
+        startIcon={<AddCircleOutlineIcon />}
+        onClick={onCreateBoardCallback}
+        sx={{
+          backgroundColor: 'rgba(168,168,168,0.15)',
+          color: '#e0e0e0',
+          border: '1px solid rgba(168,168,168,0.3)',
+          textTransform: 'none',
+          fontWeight: 600,
+          '&:hover': {
+            backgroundColor: 'rgba(168,168,168,0.25)',
+          },
+        }}
+      >
+        Deploy New Poll
+      </Button>
+
+      <Button
+        data-testid="board-join-btn"
+        variant="outlined"
+        fullWidth
+        startIcon={<LinkIcon />}
+        onClick={() => setTextPromptOpen(true)}
+        sx={{
+          borderColor: 'rgba(168,168,168,0.3)',
+          color: '#a8a8a8',
+          textTransform: 'none',
+          fontWeight: 600,
+          '&:hover': {
+            borderColor: 'rgba(168,168,168,0.6)',
+            backgroundColor: 'rgba(168,168,168,0.05)',
+          },
+        }}
+      >
+        Join Existing Poll
+      </Button>
+
+      {/* Hint */}
+      <Typography variant="caption" sx={{ color: '#555', textAlign: 'center' }}>
+        Requires Midnight Lace or 1AM wallet extension
+      </Typography>
+
       <TextPromptDialog
         prompt="Enter Poll Contract Address"
         isOpen={textPromptOpen}
-        onCancel={() => {
-          setTextPromptOpen(false);
-        }}
+        onCancel={() => setTextPromptOpen(false)}
         onSubmit={(text) => {
           setTextPromptOpen(false);
           onJoinBoardCallback(text);
         }}
       />
-    </React.Fragment>
+    </CardContent>
   );
 };

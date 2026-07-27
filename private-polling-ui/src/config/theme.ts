@@ -1,40 +1,62 @@
-// This file is part of midnightntwrk/example-bboard.
-// Copyright (C) Midnight Foundation
-// SPDX-License-Identifier: Apache-2.0
-// Licensed under the Apache License, Version 2.0 (the "License");
-// You may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-import { createTheme, alpha } from '@mui/material';
-
-const midnightGrey = alpha('#a8a8a8', 0.7);
+import { createTheme } from '@mui/material';
 
 export const theme = createTheme({
   typography: {
-    fontFamily: 'Helvetica',
+    fontFamily: '"Inter", "Helvetica Neue", Helvetica, Arial, sans-serif',
     allVariants: {
-      color: 'white',
+      color: '#e0e0e0',
     },
   },
   palette: {
+    mode: 'dark',
     primary: {
-      main: midnightGrey,
-      light: alpha(midnightGrey, 0.5),
-      dark: alpha(midnightGrey, 0.9),
+      main: '#a8a8a8',
+      light: '#c8c8c8',
+      dark: '#888888',
     },
     secondary: {
-      main: '#8c8c8c',
+      main: '#666666',
     },
     background: {
-      default: '#464655',
+      default: '#0a0a0f',
+      paper: 'rgba(255,255,255,0.04)',
+    },
+    success: {
+      main: '#4caf50',
+    },
+    error: {
+      main: '#f44336',
+    },
+    text: {
+      primary: '#e0e0e0',
+      secondary: '#888888',
+    },
+  },
+  components: {
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+        },
+      },
+    },
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          backgroundColor: '#0a0a0f',
+          scrollbarColor: '#333 #0a0a0f',
+          '&::-webkit-scrollbar': {
+            width: 8,
+          },
+          '&::-webkit-scrollbar-track': {
+            background: '#0a0a0f',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: '#333',
+            borderRadius: 4,
+          },
+        },
+      },
     },
   },
 });
