@@ -5,7 +5,7 @@ import ShieldIcon from '@mui/icons-material/VerifiedUser';
 import { WalletConnectButton } from '../WalletConnectButton';
 import { type NetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 
-const networkId = (import.meta.env.VITE_NETWORK_ID as NetworkId) || 'preprod';
+const networkId: NetworkId = import.meta.env.VITE_NETWORK_ID || 'preprod';
 
 /**
  * Application header — branding, ZK badge, and wallet connect/disconnect button.

@@ -32,7 +32,7 @@ import '@midnight-ntwrk/dapp-connector-api';
 import * as pino from 'pino';
 import { DeployedBoardProvider } from './contexts';
 
-const networkId = import.meta.env.VITE_NETWORK_ID as NetworkId;
+const networkId: NetworkId = import.meta.env.VITE_NETWORK_ID;
 const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS;
 
 // Set network ID for all Midnight libraries
@@ -40,7 +40,7 @@ setNetworkId(networkId);
 
 // Create a default `pino` logger and configure it with the configured logging level.
 export const logger = pino.pino({
-  level: import.meta.env.VITE_LOGGING_LEVEL as string,
+  level: import.meta.env.VITE_LOGGING_LEVEL,
 });
 
 logger.info(`networkId = ${networkId}`);

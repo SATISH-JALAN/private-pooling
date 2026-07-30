@@ -43,8 +43,7 @@ const isProgressStrictlyComplete = (progress: unknown): boolean => {
   return false;
 };
 
-const isFacadeStateSynced = (state: FacadeState): boolean =>
-  isProgressStrictlyComplete(state.unshielded.progress);
+const isFacadeStateSynced = (state: FacadeState): boolean => isProgressStrictlyComplete(state.unshielded.progress);
 
 export const syncWallet = (logger: Logger, wallet: WalletFacade, throttleTime = 2_000) => {
   logger.info('Syncing wallet...');

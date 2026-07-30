@@ -12,8 +12,8 @@ import {
   type PrivateStateId,
 } from '../../api/src/index';
 import { type WalletFacade } from '@midnight-ntwrk/wallet-sdk-facade';
-import type { Ledger, PollState } from '../../contract/src/managed/private-polling/contract/index.d.cts';
-import { ledger } from '../../contract/src/managed/private-polling/contract/index.js';
+import type { Ledger } from '../../contract/src/managed/private-polling/contract/index.d.cts';
+import { ledger, PollState } from '../../contract/src/managed/private-polling/contract/index.js';
 import { NodeZkConfigProvider } from '@midnight-ntwrk/midnight-js-node-zk-config-provider';
 import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
 import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client-proof-provider';
@@ -39,7 +39,7 @@ export const getPollingLedgerState = async (
 ): Promise<Ledger | null> => {
   assertIsContractAddress(contractAddress);
   const contractState = await providers.publicDataProvider.queryContractState(contractAddress);
-  return contractState != null ? ledger(contractState.data as any) : null;
+  return contractState != null ? ledger(contractState.data.state) : null;
 };
 
 const DEPLOY_OR_JOIN_QUESTION = `
@@ -49,7 +49,11 @@ You can do one of the following:
   3. Exit
 Which would you like to do? `;
 
-const deployOrJoin = async (providers: PrivatePollingProviders, rli: Interface, logger: Logger): Promise<PrivatePollingAPI | null> => {
+const deployOrJoin = async (
+  providers: PrivatePollingProviders,
+  rli: Interface,
+  logger: Logger,
+): Promise<PrivatePollingAPI | null> => {
   let api: PrivatePollingAPI | null = null;
 
   while (true) {
@@ -60,7 +64,11 @@ const deployOrJoin = async (providers: PrivatePollingProviders, rli: Interface, 
         logger.info(`Deployed contract at address: ${api.deployedContractAddress}`);
         return api;
       case '2':
-        api = await PrivatePollingAPI.join(providers, await rli.question('What is the contract address (in hex)? '), logger);
+        api = await PrivatePollingAPI.join(
+          providers,
+          await rli.question('What is the contract address (in hex)? '),
+          logger,
+        );
         logger.info(`Joined contract at address: ${api.deployedContractAddress}`);
         return api;
       case '3':
@@ -82,11 +90,13 @@ const displayLedgerState = async (
   if (ledgerState === null) {
     logger.info(`There is no private polling contract deployed at ${contractAddress}`);
   } else {
-    const status = (ledgerState.pollState as number) === 1 ? 'OPEN' : 'CLOSED';
+    const status = ledgerState.pollState === PollState.OPEN ? 'OPEN' : 'CLOSED';
     const question = !ledgerState.pollQuestion.is_some ? 'none' : ledgerState.pollQuestion.value;
     logger.info(`Current poll status: '${status}'`);
     logger.info(`Poll question: '${question}'`);
-    logger.info(`Votes: Yes = ${ledgerState.yesVotes}, No = ${ledgerState.noVotes}, Abstain = ${ledgerState.abstainVotes}`);
+    logger.info(
+      `Votes: Yes = ${ledgerState.yesVotes}, No = ${ledgerState.noVotes}, Abstain = ${ledgerState.abstainVotes}`,
+    );
     logger.info(`Current owner is: '${toHex(ledgerState.owner)}'`);
   }
 };
@@ -104,7 +114,7 @@ const displayDerivedState = (state: PrivatePollingDerivedState | undefined, logg
   if (state === undefined) {
     logger.info(`No polling state currently available`);
   } else {
-    const status = (state.pollState as number) === 1 ? 'OPEN' : 'CLOSED';
+    const status = state.pollState === PollState.OPEN ? 'OPEN' : 'CLOSED';
     logger.info(`Current poll status: '${status}'`);
     logger.info(`Poll question: '${state.pollQuestion ?? 'none'}'`);
     logger.info(`Votes: Yes = ${state.yesVotes}, No = ${state.noVotes}, Abstain = ${state.abstainVotes}`);

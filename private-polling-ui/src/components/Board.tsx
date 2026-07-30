@@ -50,13 +50,12 @@ export interface BoardProps {
 }
 
 // Shown while contract address is pending
-const CONTRACT_ADDRESS_PLACEHOLDER = import.meta.env.VITE_CONTRACT_ADDRESS as string
-  || '0200dbf964f541e1950883f5b2f539b66fd6111e46ce8e6e9551fbdd180114d5dd5b';
+const CONTRACT_ADDRESS_PLACEHOLDER =
+  import.meta.env.VITE_CONTRACT_ADDRESS || '0200dbf964f541e1950883f5b2f539b66fd6111e46ce8e6e9551fbdd180114d5dd5b';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const pct = (part: bigint, total: bigint): number =>
-  total === 0n ? 0 : Math.round(Number((part * 100n) / total));
+const pct = (part: bigint, total: bigint): number => (total === 0n ? 0 : Math.round(Number((part * 100n) / total)));
 
 const shortAddress = (addr: ContractAddress | null): string => {
   if (!addr) return 'Deploying…';
@@ -79,7 +78,9 @@ const VoteBar: React.FC<{
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           {icon}
-          <Typography variant="caption" sx={{ color: '#bbb', fontWeight: 600 }}>{label}</Typography>
+          <Typography variant="caption" sx={{ color: '#bbb', fontWeight: 600 }}>
+            {label}
+          </Typography>
         </Box>
         <Typography variant="caption" sx={{ color: '#bbb' }}>
           {count.toString()} ({percentage}%)
@@ -89,7 +90,8 @@ const VoteBar: React.FC<{
         variant="determinate"
         value={percentage}
         sx={{
-          height: 6, borderRadius: 3,
+          height: 6,
+          borderRadius: 3,
           backgroundColor: 'rgba(255,255,255,0.08)',
           '& .MuiLinearProgress-bar': { backgroundColor: color, borderRadius: 3 },
         }}
@@ -121,10 +123,7 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
 
   // ── Navigation callbacks ──────────────────────────────────────────────────
 
-  const onCreateBoard = useCallback(
-    () => boardApiProvider.resolve(),
-    [boardApiProvider],
-  );
+  const onCreateBoard = useCallback(() => boardApiProvider.resolve(), [boardApiProvider]);
 
   const onJoinBoard = useCallback(
     (addr: ContractAddress) => boardApiProvider.resolve(addr || CONTRACT_ADDRESS_PLACEHOLDER),
@@ -155,10 +154,19 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
           icon={<LockOpenIcon sx={{ fontSize: '14px !important', color: '#4caf50 !important' }} />}
           label="Poll Open · Voting Live"
           size="small"
-          sx={{ mb: 2, backgroundColor: 'rgba(76,175,80,0.1)', border: '1px solid rgba(76,175,80,0.3)', color: '#4caf50', fontSize: 11 }}
+          sx={{
+            mb: 2,
+            backgroundColor: 'rgba(76,175,80,0.1)',
+            border: '1px solid rgba(76,175,80,0.3)',
+            color: '#4caf50',
+            fontSize: 11,
+          }}
         />
 
-        <Typography variant="h6" sx={{ fontWeight: 700, color: '#fff', lineHeight: 1.4, mb: 2.5, wordBreak: 'break-word' }}>
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: 700, color: '#fff', lineHeight: 1.4, mb: 2.5, wordBreak: 'break-word' }}
+        >
           {state.pollQuestion || 'Loading question…'}
         </Typography>
 
@@ -167,9 +175,27 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
             <Typography variant="caption" sx={{ color: '#666', display: 'block', mb: 1 }}>
               Current tally ({total.toString()} vote{total !== 1n ? 's' : ''})
             </Typography>
-            <VoteBar label="Yes" icon={<CheckIcon sx={{ fontSize: 12, color: '#4caf50' }} />} count={state.yesVotes} total={total} color="#4caf50" />
-            <VoteBar label="No" icon={<CloseIcon sx={{ fontSize: 12, color: '#f44336' }} />} count={state.noVotes} total={total} color="#f44336" />
-            <VoteBar label="Abstain" icon={<RemoveIcon sx={{ fontSize: 12, color: '#9e9e9e' }} />} count={state.abstainVotes} total={total} color="#9e9e9e" />
+            <VoteBar
+              label="Yes"
+              icon={<CheckIcon sx={{ fontSize: 12, color: '#4caf50' }} />}
+              count={state.yesVotes}
+              total={total}
+              color="#4caf50"
+            />
+            <VoteBar
+              label="No"
+              icon={<CloseIcon sx={{ fontSize: 12, color: '#f44336' }} />}
+              count={state.noVotes}
+              total={total}
+              color="#f44336"
+            />
+            <VoteBar
+              label="Abstain"
+              icon={<RemoveIcon sx={{ fontSize: 12, color: '#9e9e9e' }} />}
+              count={state.abstainVotes}
+              total={total}
+              color="#9e9e9e"
+            />
           </Box>
         )}
 
@@ -182,29 +208,55 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
         {/* castVote circuit calls */}
         <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
           <Button
-            variant="contained" size="small" fullWidth
+            variant="contained"
+            size="small"
+            fullWidth
             startIcon={<CheckIcon />}
             disabled={isLoading}
             onClick={() => void castVote(0)}
-            sx={{ backgroundColor: 'rgba(76,175,80,0.2)', border: '1px solid rgba(76,175,80,0.5)', color: '#4caf50', textTransform: 'none', fontWeight: 700, '&:hover': { backgroundColor: 'rgba(76,175,80,0.35)' } }}
+            sx={{
+              backgroundColor: 'rgba(76,175,80,0.2)',
+              border: '1px solid rgba(76,175,80,0.5)',
+              color: '#4caf50',
+              textTransform: 'none',
+              fontWeight: 700,
+              '&:hover': { backgroundColor: 'rgba(76,175,80,0.35)' },
+            }}
           >
             Yes
           </Button>
           <Button
-            variant="contained" size="small" fullWidth
+            variant="contained"
+            size="small"
+            fullWidth
             startIcon={<CloseIcon />}
             disabled={isLoading}
             onClick={() => void castVote(1)}
-            sx={{ backgroundColor: 'rgba(244,67,54,0.2)', border: '1px solid rgba(244,67,54,0.5)', color: '#f44336', textTransform: 'none', fontWeight: 700, '&:hover': { backgroundColor: 'rgba(244,67,54,0.35)' } }}
+            sx={{
+              backgroundColor: 'rgba(244,67,54,0.2)',
+              border: '1px solid rgba(244,67,54,0.5)',
+              color: '#f44336',
+              textTransform: 'none',
+              fontWeight: 700,
+              '&:hover': { backgroundColor: 'rgba(244,67,54,0.35)' },
+            }}
           >
             No
           </Button>
           <Button
-            variant="outlined" size="small" fullWidth
+            variant="outlined"
+            size="small"
+            fullWidth
             startIcon={<RemoveIcon />}
             disabled={isLoading}
             onClick={() => void castVote(2)}
-            sx={{ borderColor: 'rgba(158,158,158,0.4)', color: '#9e9e9e', textTransform: 'none', fontWeight: 700, '&:hover': { backgroundColor: 'rgba(158,158,158,0.1)' } }}
+            sx={{
+              borderColor: 'rgba(158,158,158,0.4)',
+              color: '#9e9e9e',
+              textTransform: 'none',
+              fontWeight: 700,
+              '&:hover': { backgroundColor: 'rgba(158,158,158,0.1)' },
+            }}
           >
             Abstain
           </Button>
@@ -213,11 +265,18 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
         {/* closePoll circuit call — visible only to poll creator */}
         {state.isOwner && (
           <Button
-            variant="text" size="small" fullWidth
+            variant="text"
+            size="small"
+            fullWidth
             startIcon={<CancelIcon />}
             disabled={isLoading}
             onClick={() => void closePoll()}
-            sx={{ color: '#666', textTransform: 'none', fontSize: 12, '&:hover': { color: '#f44336', backgroundColor: 'rgba(244,67,54,0.05)' } }}
+            sx={{
+              color: '#666',
+              textTransform: 'none',
+              fontSize: 12,
+              '&:hover': { color: '#f44336', backgroundColor: 'rgba(244,67,54,0.05)' },
+            }}
           >
             Close Poll (you&apos;re the creator)
           </Button>
@@ -234,7 +293,13 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
           icon={<LockIcon sx={{ fontSize: '14px !important', color: '#888 !important' }} />}
           label="Poll Closed"
           size="small"
-          sx={{ mb: 2, backgroundColor: 'rgba(168,168,168,0.08)', border: '1px solid rgba(168,168,168,0.2)', color: '#888', fontSize: 11 }}
+          sx={{
+            mb: 2,
+            backgroundColor: 'rgba(168,168,168,0.08)',
+            border: '1px solid rgba(168,168,168,0.2)',
+            color: '#888',
+            fontSize: 11,
+          }}
         />
 
         {state.pollQuestion ? (
@@ -247,14 +312,34 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
                 <Typography variant="caption" sx={{ color: '#666', display: 'block', mb: 1 }}>
                   Final results ({total.toString()} vote{total !== 1n ? 's' : ''})
                 </Typography>
-                <VoteBar label="Yes" icon={<CheckIcon sx={{ fontSize: 12, color: '#4caf50' }} />} count={state.yesVotes} total={total} color="#4caf50" />
-                <VoteBar label="No" icon={<CloseIcon sx={{ fontSize: 12, color: '#f44336' }} />} count={state.noVotes} total={total} color="#f44336" />
-                <VoteBar label="Abstain" icon={<RemoveIcon sx={{ fontSize: 12, color: '#9e9e9e' }} />} count={state.abstainVotes} total={total} color="#9e9e9e" />
+                <VoteBar
+                  label="Yes"
+                  icon={<CheckIcon sx={{ fontSize: 12, color: '#4caf50' }} />}
+                  count={state.yesVotes}
+                  total={total}
+                  color="#4caf50"
+                />
+                <VoteBar
+                  label="No"
+                  icon={<CloseIcon sx={{ fontSize: 12, color: '#f44336' }} />}
+                  count={state.noVotes}
+                  total={total}
+                  color="#f44336"
+                />
+                <VoteBar
+                  label="Abstain"
+                  icon={<RemoveIcon sx={{ fontSize: 12, color: '#9e9e9e' }} />}
+                  count={state.abstainVotes}
+                  total={total}
+                  color="#9e9e9e"
+                />
               </>
             )}
           </Box>
         ) : (
-          <Typography variant="body2" sx={{ color: '#666', mb: 2 }}>No poll has been created yet.</Typography>
+          <Typography variant="body2" sx={{ color: '#666', mb: 2 }}>
+            No poll has been created yet.
+          </Typography>
         )}
 
         <Divider sx={{ borderColor: 'rgba(168,168,168,0.1)', mb: 2 }} />
@@ -264,9 +349,13 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
         </Typography>
 
         <TextField
-          variant="outlined" fullWidth multiline rows={2}
+          variant="outlined"
+          fullWidth
+          multiline
+          rows={2}
           placeholder="Type your poll question…"
-          size="small" value={questionPrompt}
+          size="small"
+          value={questionPrompt}
           onChange={(e) => setQuestionPrompt(e.target.value)}
           sx={{
             mb: 1.5,
@@ -281,13 +370,17 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
 
         {/* createPoll circuit call */}
         <Button
-          variant="contained" fullWidth
+          variant="contained"
+          fullWidth
           startIcon={<HowToVoteIcon />}
           disabled={!questionPrompt.trim() || isLoading}
           onClick={() => void onCreatePoll()}
           sx={{
-            backgroundColor: 'rgba(168,168,168,0.15)', color: '#e0e0e0',
-            border: '1px solid rgba(168,168,168,0.3)', textTransform: 'none', fontWeight: 700,
+            backgroundColor: 'rgba(168,168,168,0.15)',
+            color: '#e0e0e0',
+            border: '1px solid rgba(168,168,168,0.3)',
+            textTransform: 'none',
+            fontWeight: 700,
             '&:hover': { backgroundColor: 'rgba(168,168,168,0.25)' },
             '&:disabled': { color: '#444', borderColor: 'rgba(168,168,168,0.1)' },
           }}
@@ -303,9 +396,14 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
   return (
     <Card
       sx={{
-        position: 'relative', width: { xs: '100%', sm: 400 }, minHeight: 420,
-        background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(168,168,168,0.15)',
-        borderRadius: 2, backdropFilter: 'blur(8px)', p: 0,
+        position: 'relative',
+        width: { xs: '100%', sm: 400 },
+        minHeight: 420,
+        background: 'rgba(255,255,255,0.04)',
+        border: '1px solid rgba(168,168,168,0.15)',
+        borderRadius: 2,
+        backdropFilter: 'blur(8px)',
+        p: 0,
       }}
     >
       {/* Empty state */}
@@ -333,7 +431,16 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
             open={!!error}
             onClick={clearError}
           >
-            <Box sx={{ background: 'rgba(10,10,15,0.95)', border: '1px solid rgba(244,67,54,0.4)', borderRadius: 2, p: 3, textAlign: 'center', maxWidth: 320 }}>
+            <Box
+              sx={{
+                background: 'rgba(10,10,15,0.95)',
+                border: '1px solid rgba(244,67,54,0.4)',
+                borderRadius: 2,
+                p: 3,
+                textAlign: 'center',
+                maxWidth: 320,
+              }}
+            >
               <ErrorOutlineIcon sx={{ fontSize: 36, color: '#f44336', mb: 1 }} />
               <Typography variant="body2" data-testid="board-error-message" sx={{ color: '#f44336', mb: 1 }}>
                 {error}
@@ -349,15 +456,21 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
             sx={{ borderBottom: '1px solid rgba(168,168,168,0.1)', pb: 1.5 }}
             avatar={
               pollState ? (
-                pollState.pollState === PollState.OPEN
-                  ? <LockOpenIcon sx={{ color: '#4caf50' }} data-testid="post-unlocked-icon" />
-                  : <LockIcon sx={{ color: '#666' }} data-testid="post-locked-icon" />
+                pollState.pollState === PollState.OPEN ? (
+                  <LockOpenIcon sx={{ color: '#4caf50' }} data-testid="post-unlocked-icon" />
+                ) : (
+                  <LockIcon sx={{ color: '#666' }} data-testid="post-locked-icon" />
+                )
               ) : (
                 <Skeleton variant="circular" width={24} height={24} sx={{ bgcolor: 'rgba(255,255,255,0.08)' }} />
               )
             }
             title={
-              <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#a8a8a8', fontSize: 11 }} data-testid="board-address">
+              <Typography
+                variant="caption"
+                sx={{ fontFamily: 'monospace', color: '#a8a8a8', fontSize: 11 }}
+                data-testid="board-address"
+              >
                 {shortAddress(contractAddress)}
               </Typography>
             }
@@ -368,7 +481,11 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
             }
             action={
               <Tooltip title={copied ? 'Copied!' : 'Copy contract address'}>
-                <IconButton size="small" onClick={() => void onCopyAddress()} sx={{ color: copied ? '#4caf50' : '#666' }}>
+                <IconButton
+                  size="small"
+                  onClick={() => void onCopyAddress()}
+                  sx={{ color: copied ? '#4caf50' : '#666' }}
+                >
                   <ContentCopyIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -377,14 +494,20 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
 
           <CardContent sx={{ pt: 2 }}>
             {pollState ? (
-              pollState.pollState === PollState.OPEN
-                ? renderOpenPoll(pollState)
-                : renderClosedPoll(pollState)
+              pollState.pollState === PollState.OPEN ? (
+                renderOpenPoll(pollState)
+              ) : (
+                renderClosedPoll(pollState)
+              )
             ) : (
               <Box>
                 <Skeleton variant="text" sx={{ bgcolor: 'rgba(255,255,255,0.06)', mb: 1 }} height={28} />
                 <Skeleton variant="text" sx={{ bgcolor: 'rgba(255,255,255,0.06)', mb: 2 }} height={20} width="60%" />
-                <Skeleton variant="rectangular" sx={{ bgcolor: 'rgba(255,255,255,0.06)', borderRadius: 1 }} height={80} />
+                <Skeleton
+                  variant="rectangular"
+                  sx={{ bgcolor: 'rgba(255,255,255,0.06)', borderRadius: 1 }}
+                  height={80}
+                />
               </Box>
             )}
           </CardContent>

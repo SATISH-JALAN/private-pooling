@@ -35,19 +35,18 @@ export const generateDust = async (
   try {
     dustState = await Promise.race([
       walletFacade.dust.waitForSyncedState(),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Dust sync timeout after 30s')), 30_000),
-      ),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Dust sync timeout after 30s')), 30_000)),
     ]);
   } catch (err) {
     // If sync times out, try getting the state directly from the observable
-    logger.warn(`Dust sync timed out or failed: ${err}. Attempting to get dust state from observable...`);
+    const message = err instanceof Error ? err.message : String(err);
+    logger.warn(`Dust sync timed out or failed: ${message}. Attempting to get dust state from observable...`);
     dustState = await rx.firstValueFrom(
       walletFacade.state().pipe(
         rx.map((s) => s.dust),
         rx.timeout(15_000),
       ),
-    ) as any;
+    );
   }
 
   const networkId = getNetworkId();
@@ -65,7 +64,7 @@ export const generateDust = async (
     utxos,
     unshieldedKeystore.getPublicKey(),
     (payload) => unshieldedKeystore.signData(payload),
-    (dustState as any).address,
+    dustState.address,
   );
   const transaction = await walletFacade.finalizeRecipe(recipe);
   const txId = await walletFacade.submitTransaction(transaction);

@@ -36,7 +36,7 @@ export class PrivatePollingAPI implements DeployedPrivatePollingAPI {
     this.state$ = combineLatest(
       [
         providers.publicDataProvider.contractStateObservable(this.deployedContractAddress, { type: 'latest' }).pipe(
-          map((contractState) => PrivatePolling.ledger(contractState.data as any)),
+          map((contractState) => PrivatePolling.ledger(contractState.data.state)),
           tap((ledgerState) =>
             logger?.trace({
               ledgerStateChanged: {
@@ -75,6 +75,7 @@ export class PrivatePollingAPI implements DeployedPrivatePollingAPI {
 
   async createPoll(question: string): Promise<void> {
     this.logger?.info(`creatingPoll: ${question}`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- callTx's circuit names need `provableCircuits`
     const txData = await (this.deployedContract.callTx as any).createPoll(question);
     this.logger?.trace({
       transactionAdded: {
@@ -87,6 +88,7 @@ export class PrivatePollingAPI implements DeployedPrivatePollingAPI {
 
   async castVote(choice: number): Promise<void> {
     this.logger?.info(`castingVote: ${choice}`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see createPoll() above.
     const txData = await (this.deployedContract.callTx as any).castVote(BigInt(choice));
     this.logger?.trace({
       transactionAdded: {
@@ -99,6 +101,7 @@ export class PrivatePollingAPI implements DeployedPrivatePollingAPI {
 
   async closePoll(): Promise<void> {
     this.logger?.info('closingPoll');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see createPoll() above.
     const txData = await (this.deployedContract.callTx as any).closePoll();
     this.logger?.trace({
       transactionAdded: {
@@ -112,10 +115,11 @@ export class PrivatePollingAPI implements DeployedPrivatePollingAPI {
   static async deploy(providers: PrivatePollingProviders, logger?: Logger): Promise<PrivatePollingAPI> {
     logger?.info('deployContract');
     const deployedContract = await deployContract(providers, {
-      compiledContract: CompiledPrivatePollingContractContract as any,
+      compiledContract: CompiledPrivatePollingContractContract,
       privateStateId: privatePollingPrivateStateKey,
       initialPrivateState: createPrivatePollingPrivateState(utils.randomBytes(32)),
       args: [],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see common-types.ts for why
     } as any);
 
     logger?.trace({
@@ -124,10 +128,14 @@ export class PrivatePollingAPI implements DeployedPrivatePollingAPI {
       },
     });
 
-    return new PrivatePollingAPI(deployedContract as any, providers, logger);
+    return new PrivatePollingAPI(deployedContract, providers, logger);
   }
 
-  static async join(providers: PrivatePollingProviders, contractAddress: ContractAddress, logger?: Logger): Promise<PrivatePollingAPI> {
+  static async join(
+    providers: PrivatePollingProviders,
+    contractAddress: ContractAddress,
+    logger?: Logger,
+  ): Promise<PrivatePollingAPI> {
     logger?.info({
       joinContract: {
         contractAddress,
@@ -136,9 +144,10 @@ export class PrivatePollingAPI implements DeployedPrivatePollingAPI {
 
     const deployedContract = await findDeployedContract<PrivatePollingContract>(providers, {
       contractAddress,
-      compiledContract: CompiledPrivatePollingContractContract as any,
+      compiledContract: CompiledPrivatePollingContractContract,
       privateStateId: privatePollingPrivateStateKey,
       initialPrivateState: await PrivatePollingAPI.getPrivateState(providers, contractAddress),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see deploy() above.
     } as any);
 
     logger?.trace({
@@ -147,7 +156,7 @@ export class PrivatePollingAPI implements DeployedPrivatePollingAPI {
       },
     });
 
-    return new PrivatePollingAPI(deployedContract as any, providers, logger);
+    return new PrivatePollingAPI(deployedContract, providers, logger);
   }
 
   private static async getPrivateState(

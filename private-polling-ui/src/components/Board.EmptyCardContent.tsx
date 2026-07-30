@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
 import { type ContractAddress } from '@midnight-ntwrk/midnight-js-protocol/compact-runtime';
-import {
-  Box,
-  Button,
-  CardContent,
-  Divider,
-  Typography,
-} from '@mui/material';
+import { Box, Button, CardContent, Divider, Typography } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlined';
 import LinkIcon from '@mui/icons-material/Link';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
@@ -88,8 +82,8 @@ export const EmptyCardContent: React.FC<Readonly<EmptyCardContentProps>> = ({
         Requires Midnight Lace or 1AM wallet extension
       </Typography>
       <Typography variant="caption" sx={{ color: '#555', textAlign: 'center', display: 'block' }}>
-        Once your wallet is connected, deploying opens a fresh poll you control; joining
-        lets you vote on one that already exists — every choice stays private via ZK proofs.
+        Once your wallet is connected, deploying opens a fresh poll you control; joining lets you vote on one that
+        already exists — every choice stays private via ZK proofs.
       </Typography>
 
       <TextPromptDialog

@@ -10,11 +10,18 @@ export type PrivateStates = {
   readonly privatePollingPrivateState: PrivatePollingPrivateState;
 };
 
+// The Compact-generated `Contract` class doesn't declare `provableCircuits`, which
+// `midnight-js-contracts`'s `Contract.Any` constraint requires — `any` bridges that gap.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type PrivatePollingContract = any;
 
 export type PrivatePollingCircuitKeys = 'createPoll' | 'castVote' | 'closePoll';
 
-export type PrivatePollingProviders = MidnightProviders<PrivatePollingCircuitKeys, PrivateStateId, PrivatePollingPrivateState>;
+export type PrivatePollingProviders = MidnightProviders<
+  PrivatePollingCircuitKeys,
+  PrivateStateId,
+  PrivatePollingPrivateState
+>;
 
 export type DeployedPrivatePollingContract = FoundContract<PrivatePollingContract>;
 

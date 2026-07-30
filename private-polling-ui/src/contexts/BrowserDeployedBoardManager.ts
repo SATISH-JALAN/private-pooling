@@ -141,7 +141,7 @@ export class BrowserDeployedBoardManager implements DeployedBoardAPIProvider {
 
 /** @internal */
 const initializeProviders = async (logger: Logger): Promise<PrivatePollingProviders> => {
-  const networkId = (import.meta.env.VITE_NETWORK_ID as NetworkId) || 'preprod';
+  const networkId: NetworkId = import.meta.env.VITE_NETWORK_ID || 'preprod';
   const connectedAPI = await connectToWallet(logger, networkId);
   const zkConfigPath = window.location.origin;
   const keyMaterialProvider = new FetchZkConfigProvider<PrivatePollingCircuitKeys>(zkConfigPath, fetch.bind(window));

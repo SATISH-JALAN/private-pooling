@@ -5,11 +5,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import BalanceIcon from '@mui/icons-material/Balance';
 import { Header } from './Header';
 
-const PrivacyFeature: React.FC<{ icon: React.ReactNode; title: string; desc: string }> = ({
-  icon,
-  title,
-  desc,
-}) => (
+const PrivacyFeature: React.FC<{ icon: React.ReactNode; title: string; desc: string }> = ({ icon, title, desc }) => (
   <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start', maxWidth: 220 }}>
     <Box sx={{ color: '#a8a8a8', mt: 0.3, flexShrink: 0 }}>{icon}</Box>
     <Box>
@@ -61,12 +57,9 @@ export const MainLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
             Prove Honestly.
           </Box>
         </Typography>
-        <Typography
-          variant="body1"
-          sx={{ color: '#888', maxWidth: 520, mx: 'auto', lineHeight: 1.7 }}
-        >
-          Deploy a poll, cast your vote with a zero-knowledge proof, and tally results — without
-          ever revealing who voted for what.
+        <Typography variant="body1" sx={{ color: '#888', maxWidth: 520, mx: 'auto', lineHeight: 1.7 }}>
+          Deploy a poll, cast your vote with a zero-knowledge proof, and tally results — without ever revealing who
+          voted for what.
         </Typography>
       </Box>
 
@@ -86,13 +79,21 @@ export const MainLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
           title="Hidden Votes"
           desc="Your individual vote is never recorded on-chain. Only the aggregate tally is public."
         />
-        <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(168,168,168,0.1)', display: { xs: 'none', md: 'block' } }} />
+        <Divider
+          orientation="vertical"
+          flexItem
+          sx={{ borderColor: 'rgba(168,168,168,0.1)', display: { xs: 'none', md: 'block' } }}
+        />
         <PrivacyFeature
           icon={<LockIcon fontSize="small" />}
           title="ZK-Proven Eligibility"
           desc="You prove you're eligible to vote without revealing your identity."
         />
-        <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(168,168,168,0.1)', display: { xs: 'none', md: 'block' } }} />
+        <Divider
+          orientation="vertical"
+          flexItem
+          sx={{ borderColor: 'rgba(168,168,168,0.1)', display: { xs: 'none', md: 'block' } }}
+        />
         <PrivacyFeature
           icon={<BalanceIcon fontSize="small" />}
           title="Verifiable Results"
