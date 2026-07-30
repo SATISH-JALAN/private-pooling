@@ -14,8 +14,6 @@ A zero-knowledge, privacy-preserving polling application built on the Midnight N
 CONTRACT_ADDRESS=0200dbf964f541e1950883f5b2f539b66fd6111e46ce8e6e9551fbdd180114d5dd5b
 ```
 
-> **Note:** Replace the address above with your own deployed contract address after running the deployment command.
-
 ---
 
 ## Features
@@ -202,17 +200,9 @@ On success you will see:
 ```
 ====================================================
 DEPLOYMENT SUCCESSFUL!
-Contract Address: 0200xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Contract Address: 0200dbf964f541e1950883f5b2f539b66fd6111e46ce8e6e9551fbdd180114d5dd5b
 ====================================================
 ```
-
-### After Deployment
-
-Replace `0200dbf964f541e1950883f5b2f539b66fd6111e46ce8e6e9551fbdd180114d5dd5b` with your actual contract address in:
-
-- `README.md` (the Contract Address table above)
-- `private-polling-ui/src/components/Board.tsx` — `CONTRACT_ADDRESS_PLACEHOLDER`
-- Any `.env` files
 
 ---
 
