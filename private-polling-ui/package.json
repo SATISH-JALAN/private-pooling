@@ -29,7 +29,7 @@
     "@midnight-ntwrk/midnight-js-protocol": "4.1.1",
     "@midnight-ntwrk/midnight-js-types": "4.1.1",
     "@midnight-ntwrk/private-polling-contract": "0.1.0",
-    "@mui/icons-material": "^9.1.1",
+    "@mui/icons-material": "^9.2.0",
     "@mui/material": "^9.1.1",
     "fp-ts": "^2.16.11",
     "node-stdlib-browser": "^1.3.1",
