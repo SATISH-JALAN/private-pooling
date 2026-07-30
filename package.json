@@ -12,7 +12,7 @@
     "deploy": "npm run --workspace=@midnight-ntwrk/private-polling-cli preprod-remote",
     "deploy-direct": "npm run --workspace=@midnight-ntwrk/private-polling-cli deploy-direct",
     "build": "npm run --workspaces build",
-    "compact": "cd contract && compact compile src/private-polling.compact managed/private-polling"
+    "compact": "cd contract && compact compile src/private-polling.compact src/managed/private-polling"
   },
   "workspaces": {
     "packages": [

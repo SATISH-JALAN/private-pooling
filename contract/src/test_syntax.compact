@@ -1,9 +1,0 @@
-pragma language_version 0.15.0;
-
-import CompactStandardLibrary;
-
-witness localSecretKey(): Bytes<32>;
-
-export circuit test(sk: Bytes<32>, sequence: Bytes<32>): Bytes<32> {
-  return persistent_hash<Vector<3, Bytes<32>>>([pad(32, "poll:pk:"), sequence, sk]);
-}

@@ -1,4 +1,4 @@
-pragma language_version 0.15.0;
+pragma language_version 0.23.0;
 
 import CompactStandardLibrary;
 
@@ -15,7 +15,7 @@ export ledger sequence: Counter;
 witness localSecretKey(): Bytes<32>;
 
 export circuit derivedPublicKey(sk: Bytes<32>, sequence: Bytes<32>): Bytes<32> {
-  return persistent_hash<Vector<2, Bytes<32>>>([sk, sequence]);
+  return persistentHash<Vector<2, Bytes<32>>>([sk, sequence]);
 }
 
 constructor() {
@@ -25,20 +25,21 @@ constructor() {
 }
 
 export circuit createPoll(question: Opaque<"string">): [] {
-  assert pollState == PollState.CLOSED "A poll is already open";
-  pollQuestion = some<Opaque<"string">>(question);
+  assert(pollState == PollState.CLOSED, "A poll is already open");
+  pollQuestion = some<Opaque<"string">>(disclose(question));
   pollState = PollState.OPEN;
   sequence.increment(1);
   owner = disclose(derivedPublicKey(localSecretKey(), pad(32, "0")));
 }
 
 export circuit castVote(choice: Uint<8>): [] {
-  assert pollState == PollState.OPEN "Poll is not currently open";
-  assert choice <= 2 "Invalid choice: 0=Yes, 1=No, 2=Abstain";
+  assert(pollState == PollState.OPEN, "Poll is not currently open");
+  assert(choice <= 2, "Invalid choice: 0=Yes, 1=No, 2=Abstain");
 
-  if (choice == 0) {
+  const publicChoice = disclose(choice);
+  if (publicChoice == 0) {
     yesVotes.increment(1);
-  } else if (choice == 1) {
+  } else if (publicChoice == 1) {
     noVotes.increment(1);
   } else {
     abstainVotes.increment(1);
@@ -46,8 +47,8 @@ export circuit castVote(choice: Uint<8>): [] {
 }
 
 export circuit closePoll(): [] {
-  assert pollState == PollState.OPEN "Poll is not currently open";
+  assert(pollState == PollState.OPEN, "Poll is not currently open");
   const callerPk = disclose(derivedPublicKey(localSecretKey(), pad(32, "0")));
-  assert callerPk == owner "Only the poll creator can close the poll";
+  assert(callerPk == owner, "Only the poll creator can close the poll");
   pollState = PollState.CLOSED;
 }

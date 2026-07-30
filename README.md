@@ -1,6 +1,10 @@
 # Private Polling — Privacy-Preserving Voting DApp on Midnight Network 🗳️
 
+[![CI](https://github.com/SATISH-JALAN/private-pooling/actions/workflows/ci.yaml/badge.svg)](https://github.com/SATISH-JALAN/private-pooling/actions/workflows/ci.yaml)
+
 A zero-knowledge, privacy-preserving polling application built on the Midnight Network using Compact smart contracts. Users can create polls, cast votes, and view aggregate results — without ever exposing their individual vote or identity.
+
+**Level 3 idea:** [Private Voting](#initial-idea) — anonymous ballots with publicly verifiable tallies.
 
 ---
 
@@ -149,8 +153,22 @@ cd private-polling-ui && npm install && cd ..
 
 ## Compile Compact Contract
 
+Requires the [Compact compiler](https://github.com/midnightntwrk/compact) (`compact`) on your `PATH`, pinned to the same version CI uses ([`.github/workflows/ci.yaml`](.github/workflows/ci.yaml)):
+
 ```bash
 npm run compact
+```
+
+The official installer only ships Linux/macOS binaries, so on Windows run it inside a Linux container instead:
+
+```bash
+docker run --rm -v "${PWD}:/work" -w /work/contract debian:bookworm-slim bash -c "
+  apt-get update -qq && apt-get install -y -qq curl xz-utils unzip ca-certificates &&
+  curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh &&
+  export PATH=\$HOME/.local/bin:\$PATH &&
+  compact update 0.31.0 &&
+  compact compile src/private-polling.compact ./src/managed/private-polling
+"
 ```
 
 ---
@@ -169,6 +187,25 @@ cd private-polling-ui && npm run build && cd ..
 ```
 
 ---
+
+## Testing
+
+The Compact contract has a unit test suite that exercises the compiled circuits directly (no proof server or network required) using `@midnight-ntwrk/compact-runtime`'s local simulator.
+
+```bash
+cd contract
+npm run test
+```
+
+The suite (`contract/src/test/private-polling.test.ts`) covers:
+
+- **Identity hashing** — `derivedPublicKey` is deterministic for a given secret key and differs across secret keys, so no two voters can be linked to the same identity hash.
+- **Initial state** — a freshly deployed contract starts `CLOSED` with no question and zeroed tallies.
+- **`createPoll`** — opens the poll, stores the question, and discloses only the hashed owner (never the raw secret key); rejects opening a second poll while one is already open.
+- **`castVote`** — tallies Yes/No/Abstain choices into public counters without recording which voter cast which vote; rejects out-of-range choices and votes after the poll is closed.
+- **`closePoll`** — only succeeds for the secret key that matches the poll's disclosed owner hash; a different key is rejected.
+
+This runs as part of CI (`npm run ci` inside `contract/`, wired into [`.github/workflows/ci.yaml`](.github/workflows/ci.yaml)) on every push and pull request to `main`.
 
 ## Run Locally (Development)
 
@@ -232,7 +269,7 @@ Contract Address: 0200dbf964f541e1950883f5b2f539b66fd6111e46ce8e6e9551fbdd180114
 
 ## Initial Idea
 
-**Idea #11 — Private Polling** from the Midnight Builder Level 1 Challenge.
+**Idea #11 — Private Polling** from the Midnight Builder Level 1 Challenge, carried forward for Level 3 as **Private Voting** (anonymous ballots with publicly verifiable tallies) from the Level 3 provided idea list.
 
 The goal: allow anonymous, verifiable on-chain voting where individual choices are confidential via ZK proofs, while aggregate tallies remain transparent and cryptographically verifiable on the Midnight ledger.
 

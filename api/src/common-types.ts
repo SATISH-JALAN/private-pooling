@@ -1,6 +1,6 @@
 import { type MidnightProviders } from '@midnight-ntwrk/midnight-js-types';
 import { type FoundContract } from '@midnight-ntwrk/midnight-js-contracts';
-import type { PollState } from '../../contract/src/managed/private-polling/contract/index.d.cts';
+import type { PollState } from '../../contract/src/managed/private-polling/contract/index.js';
 import type { PrivatePollingPrivateState } from '../../contract/src/index';
 
 export const privatePollingPrivateStateKey = 'privatePollingPrivateState';
