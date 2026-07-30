@@ -111,6 +111,7 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
     contractAddress,
     isLoading,
     currentAction,
+    loadingMessage,
     error,
     createPoll,
     castVote,
@@ -322,11 +323,7 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
           >
             <CircularProgress data-testid="board-working-indicator" size={36} sx={{ color: '#a8a8a8' }} />
             <Typography variant="caption" sx={{ color: '#888' }}>
-              {currentAction === 'castVote' && 'Generating ZK vote proof…'}
-              {currentAction === 'createPoll' && 'Creating poll on-chain…'}
-              {currentAction === 'closePoll' && 'Closing poll on-chain…'}
-              {currentAction === 'deploy' && 'Deploying contract…'}
-              {!currentAction && 'Working…'}
+              {loadingMessage}
             </Typography>
           </Backdrop>
 
@@ -341,7 +338,9 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
               <Typography variant="body2" data-testid="board-error-message" sx={{ color: '#f44336', mb: 1 }}>
                 {error}
               </Typography>
-              <Typography variant="caption" sx={{ color: '#666' }}>Tap to dismiss</Typography>
+              <Typography variant="caption" sx={{ color: '#666' }}>
+                Auto-dismisses in a few seconds · tap to dismiss now
+              </Typography>
             </Box>
           </Backdrop>
 

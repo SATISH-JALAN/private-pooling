@@ -62,6 +62,7 @@ export interface WalletConnectButtonProps {
 const COMPATIBLE_API_VERSION = '4.x';
 const WALLET_DETECT_INTERVAL_MS = 100;
 const WALLET_DETECT_TIMEOUT_MS = 5_000;
+const DISCONNECT_CONFIRM_WINDOW_MS = 3_000;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -91,7 +92,9 @@ export const WalletConnectButton: React.FC<WalletConnectButtonProps> = ({
     const [status, setStatus] = useState<WalletConnectionStatus>('checking');
     const [walletInfo, setWalletInfo] = useState<WalletConnectedInfo | null>(null);
     const [errorMessage, setErrorMessage] = useState<string>('');
+    const [confirmingDisconnect, setConfirmingDisconnect] = useState(false);
     const walletRef = useRef<InitialAPI | null>(null);
+    const disconnectConfirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // ── Detect wallet on mount ──────────────────────────────────────────────────
     useEffect(() => {
@@ -141,11 +144,32 @@ export const WalletConnectButton: React.FC<WalletConnectButtonProps> = ({
     }, [networkId, onConnected]);
 
     // ── Disconnect ──────────────────────────────────────────────────────────────
+    // Requires two clicks within DISCONNECT_CONFIRM_WINDOW_MS so a stray click
+    // doesn't drop the session; the button reverts on its own if not confirmed.
     const handleDisconnect = useCallback(() => {
         setWalletInfo(null);
         setStatus('found');
+        setConfirmingDisconnect(false);
         onDisconnected?.();
     }, [onDisconnected]);
+
+    const handleDisconnectClick = useCallback(() => {
+        if (confirmingDisconnect) {
+            if (disconnectConfirmTimer.current) clearTimeout(disconnectConfirmTimer.current);
+            handleDisconnect();
+            return;
+        }
+        setConfirmingDisconnect(true);
+        disconnectConfirmTimer.current = setTimeout(() => {
+            setConfirmingDisconnect(false);
+        }, DISCONNECT_CONFIRM_WINDOW_MS);
+    }, [confirmingDisconnect, handleDisconnect]);
+
+    useEffect(() => {
+        return () => {
+            if (disconnectConfirmTimer.current) clearTimeout(disconnectConfirmTimer.current);
+        };
+    }, []);
 
     // ── Retry after error ────────────────────────────────────────────────────────
     const handleRetry = useCallback(() => {
@@ -208,32 +232,39 @@ export const WalletConnectButton: React.FC<WalletConnectButtonProps> = ({
             return (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Chip
+                        data-testid="wallet-address-chip"
                         icon={<CheckCircleIcon sx={{ fontSize: '14px !important', color: '#4caf50 !important' }} />}
                         label={
                             <Tooltip title={walletInfo?.fullAddress ?? ''} placement="bottom">
-                                <Typography component="span" sx={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 600 }}>
+                                <Typography component="span" sx={{ fontSize: 12, fontFamily: 'monospace', fontWeight: 700 }}>
                                     {walletInfo?.shortAddress}
                                 </Typography>
                             </Tooltip>
                         }
                         size="small"
                         sx={{
-                            backgroundColor: 'rgba(76,175,80,0.1)',
-                            border: '1px solid rgba(76,175,80,0.4)',
+                            backgroundColor: 'rgba(76,175,80,0.12)',
+                            border: '1px solid rgba(76,175,80,0.5)',
                             color: '#4caf50',
+                            px: 0.5,
                         }}
                     />
-                    <Tooltip title="Disconnect wallet">
+                    <Tooltip title={confirmingDisconnect ? 'Click again to confirm disconnect' : 'Disconnect wallet'}>
                         <Button
                             size="small"
-                            onClick={handleDisconnect}
+                            onClick={handleDisconnectClick}
                             startIcon={<LogoutIcon sx={{ fontSize: 13 }} />}
                             sx={{
-                                ...btnStyle, borderColor: 'rgba(168,168,168,0.2)', color: '#666', minWidth: 0, px: 1,
+                                ...btnStyle,
+                                minWidth: 0,
+                                px: 1,
+                                borderColor: confirmingDisconnect ? 'rgba(244,67,54,0.6)' : 'rgba(168,168,168,0.2)',
+                                color: confirmingDisconnect ? '#f44336' : '#666',
+                                backgroundColor: confirmingDisconnect ? 'rgba(244,67,54,0.08)' : 'transparent',
                                 '&:hover': { borderColor: 'rgba(244,67,54,0.4)', color: '#f44336', backgroundColor: 'rgba(244,67,54,0.05)' }
                             }}
                         >
-                            Disconnect
+                            {confirmingDisconnect ? 'Confirm?' : 'Disconnect'}
                         </Button>
                     </Tooltip>
                 </Box>

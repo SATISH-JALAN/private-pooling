@@ -27,6 +27,11 @@ import { type BoardDeployment } from '../contexts';
 
 export type ContractAction = 'createPoll' | 'castVote' | 'closePoll' | 'deploy' | 'join' | null;
 
+const VOTE_CHOICE_LABEL: Record<0 | 1 | 2, string> = { 0: 'Yes', 1: 'No', 2: 'Abstain' };
+
+/** Errors auto-dismiss after this long, so a stale banner never blocks the UI. */
+const ERROR_AUTO_DISMISS_MS = 5_000;
+
 export interface UsePollingContractResult {
   /** Current derived state from the on-chain ledger */
   pollState: PrivatePollingDerivedState | null;
@@ -39,6 +44,9 @@ export interface UsePollingContractResult {
 
   /** The current action being performed, for granular UI feedback */
   currentAction: ContractAction;
+
+  /** Human-readable status for whatever `currentAction` is in flight */
+  loadingMessage: string;
 
   /** Last error message, if any */
   error: string | null;
@@ -82,7 +90,15 @@ export function usePollingContract(
   const [contractAddress, setContractAddress] = useState<ContractAddress | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(!!boardDeployment$);
   const [currentAction, setCurrentAction] = useState<ContractAction>(null);
+  const [voteChoice, setVoteChoice] = useState<0 | 1 | 2 | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Auto-dismiss errors so a stale banner never blocks the UI indefinitely
+  useEffect(() => {
+    if (!error) return;
+    const timer = setTimeout(() => setError(null), ERROR_AUTO_DISMISS_MS);
+    return () => clearTimeout(timer);
+  }, [error]);
 
   // Subscribe to deployment observable
   useEffect(() => {
@@ -154,6 +170,7 @@ export function usePollingContract(
       if (!api) return;
       setIsLoading(true);
       setCurrentAction('castVote');
+      setVoteChoice(choice);
       setError(null);
       try {
         await api.castVote(choice);
@@ -162,6 +179,7 @@ export function usePollingContract(
       } finally {
         setIsLoading(false);
         setCurrentAction(null);
+        setVoteChoice(null);
       }
     },
     [api],
@@ -188,11 +206,34 @@ export function usePollingContract(
 
   const clearError = useCallback(() => setError(null), []);
 
+  // ── Loading message ───────────────────────────────────────────────────────
+  // One specific, human-readable status per circuit call, so the UI never
+  // shows a bare spinner with no indication of what's actually happening.
+  let loadingMessage = 'Working…';
+  switch (currentAction) {
+    case 'castVote':
+      loadingMessage = `Generating ZK proof for your ${voteChoice !== null ? VOTE_CHOICE_LABEL[voteChoice] : ''} vote…`;
+      break;
+    case 'createPoll':
+      loadingMessage = 'Encrypting and submitting your poll to the chain…';
+      break;
+    case 'closePoll':
+      loadingMessage = 'Generating ZK proof to close the poll…';
+      break;
+    case 'deploy':
+      loadingMessage = 'Deploying contract to Midnight preprod…';
+      break;
+    case 'join':
+      loadingMessage = 'Connecting to existing poll contract…';
+      break;
+  }
+
   return {
     pollState,
     contractAddress,
     isLoading,
     currentAction,
+    loadingMessage,
     error,
     createPoll,
     castVote,

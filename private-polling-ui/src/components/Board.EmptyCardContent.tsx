@@ -87,6 +87,10 @@ export const EmptyCardContent: React.FC<Readonly<EmptyCardContentProps>> = ({
       <Typography variant="caption" sx={{ color: '#555', textAlign: 'center' }}>
         Requires Midnight Lace or 1AM wallet extension
       </Typography>
+      <Typography variant="caption" sx={{ color: '#555', textAlign: 'center', display: 'block' }}>
+        Once your wallet is connected, deploying opens a fresh poll you control; joining
+        lets you vote on one that already exists — every choice stays private via ZK proofs.
+      </Typography>
 
       <TextPromptDialog
         prompt="Enter Poll Contract Address"
