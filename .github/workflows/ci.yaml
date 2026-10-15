@@ -60,7 +60,7 @@ jobs:
         run: npm run ci
 
       - name: Upload compiled contract
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: compiled-contract
           path: contract/src/managed
@@ -161,7 +161,7 @@ jobs:
 
       - name: Upload logs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-logs
           path: private-polling-cli/logs
